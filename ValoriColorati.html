@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valutazione Partecipazione - Proporzionale</title>
+    <style>
+        :root {
+            --color-cream-50: rgba(252, 252, 249, 1);
+            --color-cream-100: rgba(255, 255, 253, 1);
+            --color-slate-500: rgba(98, 108, 113, 1);
+            --color-slate-900: rgba(19, 52, 59, 1);
+            --color-teal-500: rgba(33, 128, 141, 1);
+            --color-teal-600: rgba(29, 116, 128, 1);
+            --color-brown-600-rgb: 94, 82, 64;
+            
+            /* Colori dei livelli */
+            --level-m1: #f8d7da; /* Rosso pastello */
+            --level-0: #fff3cd;  /* Giallo pastello */
+            --level-p1: #ffe5d0; /* Arancione pastello */
+            --level-p2: #d4edda; /* Verde pastello */
+            --level-p3: #cce5ff; /* Blu pastello */
+            
+            --level-m1-active: #dc3545; /* Rosso acceso */
+            --level-0-active: #ffc107;  /* Giallo acceso */
+            --level-p1-active: #fd7e14; /* Arancione acceso */
+            --level-p2-active: #28a745; /* Verde acceso */
+            --level-p3-active: #007bff; /* Blu acceso */
+
+            --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --space-20: 20px;
+            --space-24: 24px;
+            --radius-base: 8px;
+            --radius-lg: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: var(--font-family-base); background-color: var(--color-cream-50); color: var(--color-slate-900); padding: var(--space-20); line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .setup-section, .criterion-card, .student-header, .summary-table, .info-box {
+            background: var(--color-cream-100); border: 1px solid rgba(var(--color-brown-600-rgb), 0.12);
+            border-radius: var(--radius-lg); padding: var(--space-24); margin-bottom: var(--space-24);
+        }
+
+        textarea { width: 100%; min-height: 120px; padding: 12px; border: 1px solid rgba(0,0,0,0.1); border-radius: var(--radius-base); margin-bottom: 16px; font-size: 14px; }
+        
+        .btn { display: inline-block; padding: 12px 24px; background: var(--color-teal-500); color: white; border: none; border-radius: var(--radius-base); cursor: pointer; font-weight: 500; transition: 0.2s; }
+        .btn:hover { background: var(--color-teal-600); }
+        .btn-secondary { background: rgba(var(--color-brown-600-rgb), 0.12); color: var(--color-slate-900); }
+
+        .evaluation-section, .summary-section { display: none; }
+        .active { display: block; }
+
+        .student-name { font-size: 24px; font-weight: 600; color: var(--color-teal-500); }
+        
+        /* Griglia pulsanti */
+        .score-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .score-btn { 
+            flex: 1; min-height: 50px; border: 2px solid transparent; border-radius: var(--radius-base); 
+            cursor: pointer; font-size: 20px; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Stili specifici per colore */
+        .btn-m1 { background-color: var(--level-m1); }
+        .btn-0  { background-color: var(--level-0); }
+        .btn-p1 { background-color: var(--level-p1); }
+        .btn-p2 { background-color: var(--level-p2); }
+        .btn-p3 { background-color: var(--level-p3); }
+
+        /* Stati selezionati */
+        .btn-m1.selected { background-color: var(--level-m1-active); color: white; transform: scale(1.05); border-color: #721c24; }
+        .btn-0.selected  { background-color: var(--level-0-active); color: black; transform: scale(1.05); border-color: #856404; }
+        .btn-p1.selected { background-color: var(--level-p1-active); color: white; transform: scale(1.05); border-color: #d35400; }
+        .btn-p2.selected { background-color: var(--level-p2-active); color: white; transform: scale(1.05); border-color: #1e7e34; }
+        .btn-p3.selected { background-color: var(--level-p3-active); color: white; transform: scale(1.05); border-color: #0056b3; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        th { background: rgba(var(--color-brown-600-rgb), 0.12); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Valutazione Partecipazione</h1>
+
+        <div id="setupSection" class="setup-section">
+            <h2>1. Elenco Studenti</h2>
+            <textarea id="studentInput" placeholder="Inserisci un nome per riga..."></textarea>
+            <button class="btn" onclick="startEvaluation()">Inizia Valutazione</button>
+        </div>
+
+        <div id="evaluationSection" class="evaluation-section">
+            <div class="student-header">
+                <div class="student-name" id="currentStudentName"></div>
+                <div id="progressText" style="color: #666;"></div>
+            </div>
+            <div id="criteriaContainer"></div>
+            <div style="display:flex; justify-content: space-between;">
+                <button class="btn btn-secondary" onclick="previousStudent()">← Indietro</button>
+                <button class="btn" onclick="nextStudent()">Avanti →</button>
+            </div>
+        </div>
+
+        <div id="summarySection" class="summary-section">
+            <h2>Riepilogo Valutazioni</h2>
+            <div class="summary-table" id="summaryTableContainer"></div>
+            <div class="info-box">
+                <h3>ℹ️ Metodo di Calcolo</h3>
+                <p>Voto proporzionale 1-10 calcolato sui valori "nascosti" (-1 a +3):</p>
+                <p style="margin-top:10px;"><code>Voto = 1 + 9 × (Totale + 7) / 28</code></p>
+            </div>
+            <div style="display:flex; gap: 10px;">
+                <button class="btn" onclick="exportToExcel()">📥 Scarica CSV</button>
+                <button class="btn btn-secondary" onclick="confirmReset()">🔄 Nuova Valutazione</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const criteria = [
+            { id: 1, title: "1. Impegno e partecipazione", short: "Impegno" },
+            { id: 2, title: "2. Rispetto richieste docente", short: "Rispetto" },
+            { id: 3, title: "3. Qualità comunicazione", short: "Comun." },
+            { id: 4, title: "4. Comportamento lezioni", short: "Comp." },
+            { id: 5, title: "5. Collaborazione gruppo", short: "Collab." },
+            { id: 6, title: "6. Responsabilità lavoro", short: "Resp." },
+            { id: 7, title: "7. Lealtà e onestà", short: "Lealtà" }
+        ];
+
+        let students = [], currentIdx = 0, evaluations = {};
+
+        function startEvaluation() {
+            const input = document.getElementById('studentInput').value.trim();
+            if (!input) return alert('Inserisci almeno un nome');
+            students = input.split('\n').map(n => n.trim()).filter(n => n !== "");
+            students.forEach(s => {
+                evaluations[s] = {};
+                criteria.forEach(c => evaluations[s][c.id] = null);
+            });
+            document.getElementById('setupSection').style.display = 'none';
+            document.getElementById('evaluationSection').classList.add('active');
+            renderEvaluation();
+        }
+
+        function renderEvaluation() {
+            const s = students[currentIdx];
+            document.getElementById('currentStudentName').textContent = s;
+            document.getElementById('progressText').textContent = `Studente ${currentIdx + 1} di ${students.length}`;
+            const container = document.getElementById('criteriaContainer');
+            container.innerHTML = '';
+
+            const levelClasses = { '-1': 'btn-m1', '0': 'btn-0', '1': 'btn-p1', '2': 'btn-p2', '3': 'btn-p3' };
+
+            criteria.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'criterion-card';
+                card.innerHTML = `<div style="font-weight:600; margin-bottom:8px;">${c.title}</div>`;
+                const btns = document.createElement('div');
+                btns.className = 'score-buttons';
+                
+                [-1, 0, 1, 2, 3].forEach(score => {
+                    const b = document.createElement('button');
+                    b.className = `score-btn ${levelClasses[score]} ${evaluations[s][c.id] === score ? 'selected' : ''}`;
+                    // Aggiunge la stellina solo al livello +3
+                    b.innerHTML = score === 3 ? '⭐' : ''; 
+                    b.onclick = () => { evaluations[s][c.id] = score; renderEvaluation(); };
+                    btns.appendChild(b);
+                });
+                card.appendChild(btns);
+                container.appendChild(card);
+            });
+        }
+
+        function nextStudent() {
+            if (currentIdx < students.length - 1) { currentIdx++; renderEvaluation(); }
+            else showSummary();
+        }
+
+        function previousStudent() { if (currentIdx > 0) { currentIdx--; renderEvaluation(); } }
+
+        function showSummary() {
+            document.getElementById('evaluationSection').classList.remove('active');
+            document.getElementById('summarySection').classList.add('active');
+            let html = '<table><thead><tr><th>Studente</th>';
+            criteria.forEach(c => html += `<th>${c.short}</th>`);
+            html += '<th>Tot</th><th>Voto</th></tr></thead><tbody>';
+            students.forEach(s => {
+                let total = 0;
+                html += `<tr><td><strong>${s}</strong></td>`;
+                criteria.forEach(c => {
+                    const sc = evaluations[s][c.id] !== null ? evaluations[s][c.id] : 0;
+                    total += sc;
+                    html += `<td>${sc}</td>`;
+                });
+                const grade = (1 + (9 * (total + 7) / 28)).toFixed(1);
+                html += `<td>${total}</td><td><strong>${grade}</strong></td></tr>`;
+            });
+            document.getElementById('summaryTableContainer').innerHTML = html + '</tbody></table>';
+        }
+
+        function confirmReset() {
+            if (confirm("Vuoi davvero ricominciare? Tutti i dati inseriti verranno persi.")) {
+                location.reload();
+            }
+        }
+
+        function exportToExcel() {
+            let csv = 'Studente,' + criteria.map(c => c.short).join(',') + ',Totale,Voto\n';
+            students.forEach(s => {
+                let total = 0;
+                let row = `"${s}",`;
+                criteria.forEach(c => {
+                    const sc = evaluations[s][c.id] !== null ? evaluations[s][c.id] : 0;
+                    total += sc;
+                    row += sc + ',';
+                });
+                row += `${total},${(1 + (9 * (total + 7) / 28)).toFixed(1)}\n`;
+                csv += row;
+            });
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'valutazione_studenti.csv';
+            link.click();
+        }
+    </script>
+</body>
+</html>
