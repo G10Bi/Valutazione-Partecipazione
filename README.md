@@ -1,30 +1,27 @@
 # 🏆 Autovalutazione Studenti - Voto in Decimi
 
-**Tool interattivo HTML per l'autovalutazione della partecipazione studentesca.**  
-Il docente seleziona i punteggi per 7 criteri (bottoni colorati), ottenendo un **punteggio totale** e **voto automatico in decimi** (1.0-10.0).  
+**Tool interattivo HTML per l'autovalutazione della partecipazione studentesca con bottoni colorati.**
 
-## 🎯 Come Funziona
-1. Il **docente** inserisce il nome o i nomi dei suoi studenti
-2. Il docente seleziona una casella colorata (rossa per un livello scarso, gialla per un livello insufficiente, arancione per un livello base, verde per un livello intermedio, blu con stellina per un livello avanzato)
-3. Ogni casella corrisponde a un punteggio
-4. **Vedi in tempo reale**: Totale (-7 a +21) e Voto finale
-5. **Esporta CSV** per Excel/Google Sheets
-6. **"Nuova valutazione"** per ricominciare
+## 📋 Guida Griglia Valutazione (PDF)
+**[Voci e criteri autovalutazione (PDF)](Voci-Autovalutazione.pdf)**  
+*Griglia completa dei 7 criteri con descrizioni per ogni livello*
 
-**Formule implementate:**
-- **Modalità Proporzionale**: `Voto = 1 + 9 × (Totale + 7) / 28`
-- **Modalità Valori Fissi**: Scala predefinita +0.3 per punto
+## 🚀 FLUSSO DIDATTICO (5 passi)
 
-## 📱 Per Studenti (14-19 anni)
-- **Mobile-friendly**: Funziona su smartphone
-- **DSA-friendly**: Bottoni grandi, colori distinti, feedback immediato
-- **Autonomo**: Nessuna installazione, solo un link
-- **Privacy**: Tutto locale nel browser, zero dati salvati
+1. **Docente mostra le slide** guida
+2. **Studenti si collegano** al sito: https://g10bi.github.io/Valutazione-Partecipazione/
+3. **Docente mostra e spiega** la griglia PDF (colori: rosso=-1, giallo=0, arancione=1, verde=2, blu*=3)
+4. **Studenti selezionano** casella corrispondente al loro comportamento per i 7 criteri
+5. **Studenti inviano** CSV al docente (download → email/Classroom) o **screenshot**
 
-## 👩‍🏫 Per Docenti
+## 🎯 Dettagli Tecnici
+- **Live calcolo**: Totale (-7 a +21) → Voto decimi (1.0-10.0)
+- **Formule**: Proporzionale `1 + 9×(Totale+7)/28` | Fissi +0.3/punto
+- **Mobile-friendly** | **DSA OK** | **Privacy totale** (locale)
+
+## 📱 Istruzioni Studenti (invia in Classroom)
 
 ## 📄 Licenza
-[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)  
-*Libero per uso educativo non commerciale*
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
-Sviluppato da prof. Bruno
+**Sviluppato da prof. Bruno**
